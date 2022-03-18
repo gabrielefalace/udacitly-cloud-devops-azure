@@ -1,1 +1,0 @@
-# udacitly-cloud-devops-azure
