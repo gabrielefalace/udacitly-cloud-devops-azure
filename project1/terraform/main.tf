@@ -7,7 +7,7 @@ resource "azurerm_resource_group" "main" {
   location = var.location
 
   tags = {
-    environment = "Production"
+    project_name = "Udacity-LoadBalancer"
   }
 }
 
@@ -18,7 +18,7 @@ resource "azurerm_virtual_network" "main" {
   resource_group_name = azurerm_resource_group.main.name
 
   tags = {
-    environment = "Production"
+    project_name = "Udacity-LoadBalancer"
   }
 }
 
@@ -41,7 +41,7 @@ resource "azurerm_network_interface" "main" {
   }
 
   tags = {
-    environment = "Production"
+    project_name = "Udacity-LoadBalancer"
   }
 }
 
@@ -52,7 +52,7 @@ resource "azurerm_public_ip" "main" {
   allocation_method   = "Static"
 
   tags = {
-    environment = "Production"
+    project_name = "Udacity-LoadBalancer"
   }
 }
 
@@ -74,7 +74,7 @@ resource "azurerm_network_security_group" "main" {
   }
 
   tags = {
-    environment = "Production"
+    project_name = "Udacity-LoadBalancer"
   }
 }
 
@@ -89,7 +89,7 @@ resource "azurerm_lb" "main" {
   }
 
   tags = {
-    environment = "Production"
+    project_name = "Udacity-LoadBalancer"
   }
 }
 
@@ -113,7 +113,7 @@ resource "azurerm_availability_set" "main" {
   resource_group_name = azurerm_resource_group.main.name
 
   tags = {
-    environment = "Production"
+    project_name = "Udacity-LoadBalancer"
   }
 }
 
@@ -132,7 +132,7 @@ resource "azurerm_network_interface" "pool_nic" {
   }
 
   tags = {
-    environment = "Production"
+    project_name = "Udacity-LoadBalancer"
   }
 }
 
@@ -160,6 +160,6 @@ resource "azurerm_linux_virtual_machine" "main" {
   }
 
   tags = {
-    environment = "Production"
+    project_name = "Udacity-LoadBalancer"
   }
 }
