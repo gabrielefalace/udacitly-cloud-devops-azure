@@ -68,7 +68,7 @@ resource "azurerm_network_security_group" "main" {
     access                     = "Allow"
     protocol                   = "Tcp"
     source_port_range          = "*"
-    destination_port_range     = "*"
+    destination_port_range     = "80"
     source_address_prefix      = "10.0.2.0/24"
     destination_address_prefix = "10.0.2.0/24"
   }
@@ -157,9 +157,38 @@ resource "azurerm_linux_virtual_machine" "main" {
   os_disk {
     storage_account_type = "Standard_LRS"
     caching              = "ReadWrite"
+    
   }
 
   tags = {
     project_name = "Udacity-LoadBalancer"
   }
+}
+
+resource "azurerm_managed_disk" "main" {
+  count = "${var.poolsize}"
+  name                 = "${var.prefix}-mdisk-${count.index}"
+  location             = azurerm_resource_group.main.location
+  resource_group_name  = azurerm_resource_group.main.name
+  storage_account_type = "Standard_LRS"
+  create_option        = "Empty"
+  disk_size_gb         = "1"
+
+  tags = { 
+    project_name = "Udacity-LoadBalancer" 
+  }
+}
+
+resource "azurerm_virtual_machine_data_disk_attachment" "main" {
+  count = "${var.poolsize}"
+  managed_disk_id    = azurerm_managed_disk.main[count.index].id
+  virtual_machine_id = azurerm_linux_virtual_machine.main[count.index].id 
+  lun                = count.index
+  caching            = "ReadWrite"
+}
+
+resource "azurerm_network_interface_security_group_association" "main" {
+  count = "${var.poolsize}"
+  network_interface_id      = azurerm_network_interface.pool_nic[count.index].id
+  network_security_group_id = azurerm_network_security_group.main.id
 }
