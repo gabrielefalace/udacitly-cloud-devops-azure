@@ -61,22 +61,69 @@ resource "azurerm_network_security_group" "main" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
-  security_rule {
-    name                       = "AllowTrafficOnInternalSubnet"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "80"
-    source_address_prefix      = azurerm_subnet.internal.address_prefixes[0] 
-    destination_address_prefix = azurerm_subnet.internal.address_prefixes[0] 
-  }
-
   tags = {
     project_name = "Udacity-LoadBalancer"
   }
 }
+
+# network security rules
+
+resource "azurerm_network_security_rule" "allowInBoundVms" {
+  name                        = "allowInBoundVms"
+  priority                    = 120
+  direction                   = "InBound"
+  access                      = "Allow"
+  protocol                    = "*"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = azurerm_subnet.internal.address_prefixes[0]
+  destination_address_prefix  = azurerm_subnet.internal.address_prefixes[0]
+  resource_group_name         = azurerm_resource_group.main.name
+  network_security_group_name = azurerm_network_security_group.main.name
+}
+
+resource "azurerm_network_security_rule" "allowOutBoundVms" {
+  name                        = "allowOutBoundVms"
+  priority                    = 130
+  direction                   = "OutBound"
+  access                      = "Allow"
+  protocol                    = "*"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = azurerm_subnet.internal.address_prefixes[0]
+  destination_address_prefix  = azurerm_subnet.internal.address_prefixes[0]
+  resource_group_name         = azurerm_resource_group.main.name
+  network_security_group_name = azurerm_network_security_group.main.name
+}
+
+resource "azurerm_network_security_rule" "allowInBoundFromLB" {
+  name                        = "allowInBoundFromLB"
+  priority                    = 140
+  direction                   = "InBound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "80"
+  source_address_prefix       = "AzureLoadBalancer"
+  destination_address_prefix  = azurerm_subnet.internal.address_prefixes[0]
+  resource_group_name         = azurerm_resource_group.main.name
+  network_security_group_name = azurerm_network_security_group.main.name
+}
+
+resource "azurerm_network_security_rule" "denyAll" {
+  name                        = "denyAll"
+  priority                    = 200
+  direction                   = "Inbound"
+  access                      = "Deny"
+  protocol                    = "*"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "Internet"
+  destination_address_prefix  = azurerm_subnet.internal.address_prefixes[0]
+  resource_group_name         = azurerm_resource_group.main.name
+  network_security_group_name = azurerm_network_security_group.main.name
+}
+
 
 resource "azurerm_lb" "main" {
   name                = "Project1LoadBalancer"
